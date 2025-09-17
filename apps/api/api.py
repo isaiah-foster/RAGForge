@@ -1,8 +1,11 @@
 # 'uvicorn apps.api.api:app --reload' to run
 
-
 from fastapi import FastAPI
 from pydantic import BaseModel
+from services.runtimes import llm
+from services.retrieval.retrieve import retrieve
+
+
 
 app = FastAPI()
 
@@ -15,8 +18,7 @@ async def root():
 class ChatRequest(BaseModel):
     query: str
 
-botName = "gpt-oss:20b"
-
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
-    return {"response": f"\n{botName}: {request.query}"}
+    user_input = request.query.lower()
+    return {"response": f"\n AI: {llm.get_response(user_input, retrieve(user_input))}"}

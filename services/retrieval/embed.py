@@ -1,3 +1,4 @@
+import os
 import chromadb
 import ollama
 import json
@@ -14,23 +15,19 @@ EMBEDDING_MODEL = config["EMBEDDING_MODEL"]
 
 dataset = [] #volatile storage for new data
 
+client = chromadb.PersistentClient(path="services/retrieval/Database/chroma_db") # identify chroma client in file system
 
-client = chromadb.PersistentClient(path="apps/services/retrieval/Database/chroma_db") # identify chroma client in file system
-
-
-
-collection_list = client.list_collections() 
-
-    
-collection = client.get_or_create_collection(EMBEDDING_MODEL) #create one collection per embedding model used
+collection = client.get_or_create_collection("one") #ISSUE: figure out naming syste,
 
 #
 # ISSUE: Allow removal of inactive collections based on embedding model name to save storage
 # store document names with a list of embedding models they've been vectorized to to track what to move
 #
 
-# read doc into a list of strings
-with open('Datasets/cat-facts.txt', 'r') as file1:
+base_dir = os.path.dirname(__file__)
+catfacts_path = os.path.join(base_dir, "Datasets", "cat-facts.txt")
+
+with open(catfacts_path, "r") as file1:
     dataset = file1.readlines()
     print(f'Loaded {len(dataset)} entries')
 
@@ -38,7 +35,13 @@ with open('Datasets/cat-facts.txt', 'r') as file1:
 # embed each index of dataset, add to chroma collection with corresponding ID
 for i, chunk in enumerate(dataset): 
     embedded_chunk = ollama.embed(model=EMBEDDING_MODEL, input=chunk)['embeddings'][0]
-    collection.add(ids= f"id{i}", embeddings=embedded_chunk)
+    collection.add(
+        ids= [f"id{i}"],
+        embeddings=[embedded_chunk],
+        documents=[chunk.strip()],
+        metadatas=[{"model": EMBEDDING_MODEL}]
+    )
+    
     print(f"embedded chunk {i}/{len(dataset)} and added to collection")
 
 
@@ -48,8 +51,9 @@ embedded_query = ollama.embed(model = EMBEDDING_MODEL, input= query)['embeddings
 
 results = collection.query(
     #query_texts=["example"] for chroma native embeddings
-    query_embeddings=embedded_query,
+    query_embeddings=[embedded_query],
     n_results=3 # how many results to return
 )
 
-print(results)
+print(f"Collection size: {collection.count()}")
+print(results["documents"])
