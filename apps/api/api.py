@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from services.runtimes import llm
 from services.retrieval.retrieve import retrieve
+from services.retrieval import embed
 
 
 

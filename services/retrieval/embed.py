@@ -27,7 +27,7 @@ collection = client.get_or_create_collection("one") #ISSUE: figure out naming sy
 base_dir = os.path.dirname(__file__)
 catfacts_path = os.path.join(base_dir, "Datasets", "cat-facts.txt")
 
-with open(catfacts_path, "r") as file1:
+with open(catfacts_path, "r", encoding="utf-8") as file1:
     dataset = file1.readlines()
     print(f'Loaded {len(dataset)} entries')
 
