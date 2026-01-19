@@ -4,8 +4,6 @@ import uvicorn
 from .cli import app
 from core.config import load_config
 
-load_config()  # Ensure config is loaded at startup
-
 @app.command()
 def serve(
     
@@ -16,6 +14,7 @@ def serve(
     """
     Launch LLM inference API
     """
+    load_config()  # Ensure config is loaded at startup
     uvicorn.run(
         "apps.api.api:app",
         host=host,
