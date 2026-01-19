@@ -28,7 +28,6 @@ RAGForge helps individuals and organizations set up **chat interfaces powered by
 - Ollama
 - Python >=3.12 & <3.14
 - pull nomic-embed-text and qwen3:latest with ollama
-- install tk and tcl (```sudo pacman -S tk tcl``` if on arch)
 ```bash
 ollama pull nomic-embed-text
 ollama pull qwen3:latest
