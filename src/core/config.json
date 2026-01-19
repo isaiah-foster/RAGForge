@@ -2,5 +2,5 @@
   "EMBEDDING_MODEL": "nomic-embed-text",
   "LANGUAGE_MODEL": "qwen3:latest",
   "INSTRUCTION_PROMPT": "Use the provided context to answer directly. Do not invent info. If context is missing or conflicting, say so. Keep responses concise and factual.\n\nContext:\n",
-  "LOCAL_INFERENCE": false
+  "LOCAL_INFERENCE": true
 }
