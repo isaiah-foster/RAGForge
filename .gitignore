@@ -3,8 +3,8 @@
 architecture.txt
 main.py
 ollama_key.txt
-
-Database/
+chroma_db
+todo.txt
 
 
 # Byte-compiled / optimized / DLL files

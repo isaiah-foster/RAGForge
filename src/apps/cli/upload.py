@@ -2,17 +2,17 @@ import os
 import shutil
 import tkinter as tk
 from tkinter import filedialog
-import typer
-
-app = typer.Typer()
+from .cli import app
+from core.paths import DATA_BASE_PATH, DATASET_PATH
 
 @app.command()
-def run():
-    # Determine the project root relative to this script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
-    dest_dir = os.path.join(project_root, 'services', 'retrieval', 'Datasets')
-    os.makedirs(dest_dir, exist_ok=True)
+def add_docs():
+    """
+    Add raw documents from local files to the embed queue
+    """
+    #determine datasets path
+    dest_dir = DATASET_PATH
+    dest_dir.mkdir(parents=True, exist_ok=True)
 
     # Hide the main tkinter window
     root = tk.Tk()

@@ -1,14 +1,12 @@
-import typer
 import requests
-
-app = typer.Typer(help="Chat with the API")
+from .cli import app
 
 API_URL = "http://127.0.0.1:8000"
 
 @app.command()
-def start():       
-    """Start a chat session with the server."""
-    print("Starting chat session with RagForge(type 'exit' to quit)")
+def chat():       
+    """Start a chat session with your LLM."""
+    print("Starting chat session with RagForge (type 'exit()' to quit)")
     print("-" * 50)
     
     while True:
@@ -16,7 +14,7 @@ def start():
         query = input("> ")
         
         # Check if user wants to exit
-        if query.lower() in ['exit']:
+        if query.lower() in ['exit()']:
             break
             
         # Send request to server
