@@ -26,33 +26,20 @@ RAGForge helps individuals and organizations set up **chat interfaces powered by
 
 ### Prerequisites
 - Ollama
-- Python >=3.12 & <3.14
-- pull nomic-embed-text and qwen3:latest with ollama
+- Python >=3.12 & < 3.14
+- pipx installed
+- pull nomic-embed-text and qwen3:latest with ollama to start
 ```bash
 ollama pull nomic-embed-text
 ollama pull qwen3:latest
 ```
 
-### 1. Clone the repo
+### 1. Install as a pipx package
 ```bash
-git clone https://github.com/your-username/ragforge.git
-cd ragforge
+pipx install git+https://github.com/isaiah-foster/RAGForge
 ```
 
-### 2. Open a virtual environment and install packages
-```bash
-python -m venv .venv
-source .venv/bin/activate
-.venv/bin/python -m pip install -r requirements.txt
-```
-- Set python interpreter to the one in your venv
-
-### 3. Install ragforge as a pip package in you venv
-```bash
-pip install -e .
-```
-
-### 4. Launch the API and run commands
+### 2. Launch the API and run commands
 - Start API
 ```bash
 ragforge serve
@@ -62,5 +49,10 @@ ragforge serve
 - Chat with the model!
 Hint: ask about its context to see that its retrieved data from the cat_facts.txt file
 
-### 5. Supported Commands
+### 3. Supported Commands
 - type ```ragforge --help``` for a list of commands.
+
+### 4. Notes
+- To make config changes take effect in the same API instance, use ``ragforge serve --reload`` instead
+- If on Arch linux and some other distros, you may have to run ``pip install tk tcl``
+- If you don't want to use the default language and embedding models, run ``ragforge serve --reload``, and update your model configs before running ``ragforge chat``
