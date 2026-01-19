@@ -2,6 +2,9 @@
 import typer
 import uvicorn
 from .cli import app
+from core.config import load_config
+
+load_config()  # Ensure config is loaded at startup
 
 @app.command()
 def serve(
