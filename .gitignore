@@ -5,7 +5,7 @@ main.py
 ollama_key.txt
 chroma_db
 todo.txt
-
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
