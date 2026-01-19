@@ -43,8 +43,8 @@ def get_response(query, context):
           content = chunk["message"]["content"]
           print(content, end="", flush=True)   # live CLI output
           response += content             # accumulate
-    
-    else:
+
+    elif api_key != "":
       #open ollama on turbo with api key
       client = Client(
         host = "https://ollama.com",
@@ -62,5 +62,8 @@ def get_response(query, context):
         content = part["message"]["content"]
         print(content, end='', flush=True)
         response+= content
+    
+    else:
+      response = "Error: No API key set for Ollama-hosted models. Please set your API key or enable local inference. ragforge set-ollama-api-key <your_api_key>"
       
     return response
