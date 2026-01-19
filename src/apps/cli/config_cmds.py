@@ -50,3 +50,12 @@ def set_local_inference(enabled: bool):
     save_config(cfg)
     status = "enabled" if enabled else "disabled"
     typer.echo(f"Local inference {status}.")
+    
+@app.command()
+def set_ollama_api_key(api_key: str):
+    """
+    Set the Ollama API key in config. This is required for using Ollama-hosted models. The key will never leave your local device
+    """
+    from core.config import save_api_key
+    save_api_key(api_key)
+    typer.echo("Ollama API key set.")

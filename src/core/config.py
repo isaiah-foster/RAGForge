@@ -26,3 +26,8 @@ def save_config(cfg: dict) -> None:
 
 def load_api_key():
     return load_config().get("OLLAMA_API_KEY", "")
+
+def save_api_key(api_key: str) -> None:
+    cfg = load_config()
+    cfg["OLLAMA_API_KEY"] = api_key
+    save_config(cfg)
