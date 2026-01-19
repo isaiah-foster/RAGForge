@@ -6,7 +6,7 @@ def create_default_config() -> dict:
         "EMBEDDING_MODEL": "nomic-embed-text",
         "LANGUAGE_MODEL": "qwen3:latest",
         "INSTRUCTION_PROMPT": (
-            "Determine if the following context is relevant to the user's question. If not, ignore it. If so, use the provided context to answer directly. Do not invent information. If context is missing or conflicting, say so. Keep responses concise and factual.\n\nContext:\n",
+            "Determine if the following context is relevant to the user's question. If not, ignore it. If so, use the provided context to answer directly. Do not invent information. If context is missing or conflicting, say so. Keep responses concise and factual.\n\nContext:\n"
         ),
         "LOCAL_INFERENCE": True,
         "OLLAMA_API_KEY": "",
