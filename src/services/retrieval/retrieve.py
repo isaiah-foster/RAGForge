@@ -13,8 +13,8 @@ EMBEDDING_MODEL = config["EMBEDDING_MODEL"]
 def retrieve(query):
     embedded_query = ollama.embed(model = EMBEDDING_MODEL,input=query)["embeddings"][0]
     client = chromadb.PersistentClient(path=DATA_BASE_PATH) # identify chroma client in file system
-    
-    collection = client.get_collection(EMBEDDING_MODEL) 
+
+    collection = client.get_or_create_collection(EMBEDDING_MODEL) 
     
     
     retrieved_array = collection.query(

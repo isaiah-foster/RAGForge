@@ -39,3 +39,14 @@ def list_configs():
     """
     cfg = load_config()
     print(f"Embedding Model: {cfg["EMBEDDING_MODEL"]}\nLanguage Model: {cfg["LANGUAGE_MODEL"]}\nLocal Inference: {cfg["LOCAL_INFERENCE"]}")
+    
+@app.command()
+def set_local_inference(enabled: bool):
+    """
+    Enable or disable local inference. (true or false)
+    """
+    cfg = load_config()
+    cfg["LOCAL_INFERENCE"] = enabled
+    save_config(cfg)
+    status = "enabled" if enabled else "disabled"
+    typer.echo(f"Local inference {status}.")
