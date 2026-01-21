@@ -1,11 +1,11 @@
 import ollama
 import chromadb
-from core.config import load_config
+from core.config import load_server_config
 from core.paths import DATA_BASE_PATH
 
 
 #get model name
-config = load_config()
+config = load_server_config()
     
 EMBEDDING_MODEL = config["EMBEDDING_MODEL"]
 

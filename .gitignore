@@ -1,7 +1,6 @@
 # my stuff
 .vscode
 architecture.txt
-main.py
 ollama_key.txt
 chroma_db
 todo.txt

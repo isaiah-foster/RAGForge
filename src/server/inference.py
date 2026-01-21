@@ -1,29 +1,30 @@
 import ollama
 from ollama import Client
-from core.config import load_config, load_api_key
+from core.config import load_server_config, load_ollama_api_key
+from server.retrieval import retrieve
 
-config = load_config()
-api_key = load_api_key()
+config = load_server_config()
+api_key = load_ollama_api_key()
 
 LANGUAGE_MODEL = config["LANGUAGE_MODEL"]
 
 # temporarily empty
 retrieved_knowledge = ""
 
-# create an instruction prompt for the chatbot - temp
-instruction_prompt = config["INSTRUCTION_PROMPT"]
-
 #variable for local inference
 local = config["LOCAL_INFERENCE"]
 
-def get_response(query, context):
+def stream_response(query, user_input):
+    context = retrieve(user_input)
     if context is None:
       context_str = ""
+      instruction_prompt = "You are a helpful AI assistant." #don't use rag prompt if no context
     elif not isinstance(context, str):
       context_str = str(context)
+      instruction_prompt = config["INSTRUCTION_PROMPT"]
     else:
       context_str = context
-    response = ""
+      instruction_prompt = config["INSTRUCTION_PROMPT"]
     
     if local == True:
       #open stream to model locally and send message
@@ -39,10 +40,10 @@ def get_response(query, context):
       
         #return output from local
       for chunk in stream:
-        if "message" in chunk and "content" in chunk["message"]:
-          content = chunk["message"]["content"]
-          print(content, end="", flush=True)   # live CLI output
-          response += content             # accumulate
+            # ollama python lib typically returns: {"message":{"role":"assistant","content":"..."}}
+            content = chunk.get("message", {}).get("content")
+            if content:
+                yield content
 
     elif api_key != "":
       #open ollama on turbo with api key
@@ -59,11 +60,11 @@ def get_response(query, context):
     
     #return response from turbo
       for part in client.chat(LANGUAGE_MODEL, messages=messages, stream=True):
-        content = part["message"]["content"]
-        print(content, end='', flush=True)
-        response+= content
+        content = part.get("message", {}).get("content")
+        if content:
+          yield content
     
     else:
-      response = "Error: No API key set for Ollama-hosted models. Please set your API key or enable local inference. ragforge set-ollama-api-key <your_api_key>"
-      
-    return response
+      yield ("Error: No API key set for Ollama-hosted models."
+                  "Please set your API key or enable local inference."
+                  "ragforge set-ollama-api-key <your_api_key>.")

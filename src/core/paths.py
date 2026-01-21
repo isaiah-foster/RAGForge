@@ -1,4 +1,3 @@
-from os import mkdir
 from pathlib import Path
 import platform
 
@@ -16,9 +15,11 @@ def get_app_dir() -> Path:
     return base
 
 APP_DIR = get_app_dir()
-CONFIG_PATH = APP_DIR / "config.json"
+SERVER_CONFIG_PATH = APP_DIR / "server_config.json"
+CLI_CONFIG_PATH = APP_DIR / "cli_config.json"
 DATA_BASE_PATH = APP_DIR / "db" / "chroma_db"
 DATASET_PATH = APP_DIR / "db" / "datasets"
 
-DATA_BASE_PATH.mkdir(parents=True, exist_ok=True)
-DATASET_PATH.mkdir(parents=True, exist_ok=True)
+def ensure_dirs() -> None:
+    DATA_BASE_PATH.mkdir(parents=True, exist_ok=True)
+    DATASET_PATH.mkdir(parents=True, exist_ok=True)
