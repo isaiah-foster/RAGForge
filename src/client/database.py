@@ -21,28 +21,24 @@ def embed_docs():
             print(f"Error {resp.status_code}: {resp.text}")
     except requests.exceptions.RequestException as e:
             print(f"Connection error: {e}")
-            
-
-@app.command()
+    
+@server_app.command()
 def list_collections():
     """
     List all ChromaDB collections
     """
-    try:
-        resp = requests.post(f"{API_URL}/list_collections", stream=True)
-        if resp.status_code == 200:
-            for chunk in resp.iter_content(chunk_size=None, decode_unicode=True):
-                if chunk:
-                    print(chunk, end="", flush=True)
-        else:
-            print(f"Error {resp.status_code}: {resp.text}")
-    except requests.exceptions.RequestException as e:
-            print(f"Connection error: {e}")
-    
+    service = embedService()
+    collections = service.list_collections()
+    if collections:
+        for name in collections:
+            typer.echo(f"- {name}")
+    else:
+        typer.echo("No ChromaDB collections found.")
+
 @server_app.command()
 def remove_collection(name: str):
     """
-    Remove a chosen ChromaDB Collection based on embedding model from local machine (not server)
+    Remove a chosen ChromaDB Collection based on embedding model
     """
     service = embedService()
     service.remove_collection(name)

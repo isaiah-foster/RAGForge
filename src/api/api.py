@@ -70,15 +70,4 @@ class API:
 
             return {"count": len(saved), "saved": saved}
         
-        @self.app.post("/list_collections")
-        async def list_collections_endpoint():
-            return StreamingResponse(
-                embedding.list_collections(),
-                media_type="text/plain",
-                headers={
-                    "Cache-Control": "no-cache",
-                    "X-Accel-Buffering": "no",
-                },
-            )
-        
 app = API().app
