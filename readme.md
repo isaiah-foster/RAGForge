@@ -27,16 +27,15 @@ RAGForge helps individuals and organizations set up **chat interfaces powered by
 ### Prerequisites
 - Ollama
 - Python >=3.12 & < 3.14
-- pipx installed
 - pull nomic-embed-text and qwen3:latest with ollama to start
 ```bash
 ollama pull nomic-embed-text
 ollama pull qwen3:latest
 ```
 
-### 1. Install as a pipx package
+### 1. Install as a pip package
 ```bash
-pipx install git+https://github.com/isaiah-foster/RAGForge
+pip install git+https://github.com/isaiah-foster/RAGForge
 ```
 
 ### 2. Launch the API and run commands
@@ -51,8 +50,3 @@ Hint: ask about its context to see that its retrieved data from the cat_facts.tx
 
 ### 3. Supported Commands
 - type ```ragforge --help``` for a list of commands.
-
-### 4. Notes
-- To make config changes take effect in the same API instance, use ``ragforge serve --reload`` instead
-- If on Arch linux and some other distros, you may have to run ``pip install tk tcl``
-- If you don't want to use the default language and embedding models, run ``ragforge serve --reload``, and update your model configs before running ``ragforge chat``

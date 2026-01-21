@@ -8,10 +8,11 @@ dependencies =[
     "ollama",
     "chromadb",
     "typer",
+    "python-multipart"
 ]
 
 [project.scripts]
-ragforge = "apps.cli.cli:app"
+ragforge = "client.main:app"
 
 [build-system]
 requires = ["setuptools", "wheel"]

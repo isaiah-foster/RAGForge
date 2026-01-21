@@ -1,14 +1,13 @@
 import os
 import chromadb
 import ollama
-from core.config import load_config
+from core.config import load_server_config
 from core.paths import DATA_BASE_PATH, DATASET_PATH
-from .cli import app
 
 # Class to load current embedding model's ChromaDB collection and add to/remove from it
 class embedService:
     def __init__(self):
-        self.model = load_config()["EMBEDDING_MODEL"]
+        self.model = load_server_config()["EMBEDDING_MODEL"]
         self.client = chromadb.PersistentClient(path=DATA_BASE_PATH) # identify chroma client in file system
         self.collection = self.client.get_or_create_collection(self.model) 
         self.dataset = [] #volatile storage for new data
@@ -22,6 +21,7 @@ class embedService:
 
         if not os.path.isdir(datasets_dir):
             print(f"Datasets directory not found: {datasets_dir}")
+            yield f"Datasets directory not found: {datasets_dir}\n"
             self.dataset = []
             return
 
@@ -40,11 +40,14 @@ class embedService:
                     lines = [line.rstrip("\n") for line in fh if line.strip()]
                     all_lines.extend(lines)
                     print(f"Loaded {len(lines)} entries from {fname}")
+                    yield f"loaded {len(lines)} entries from {fname}\n"
             except Exception as e:
                 print(f"Failed to read {fname}: {e}")
+                yield f"failed to read {fname}: {e}\n"
 
         self.dataset = all_lines
         print(f"Total loaded {len(self.dataset)} entries from {datasets_dir}")
+        yield f"Total loaded {len(self.dataset)} entries from {datasets_dir}\n"
 
     # Split text into sentences then embed, perform cosine similarity, and create chunks stored to self.raw_chunks
     def semantic_chunk(self, similarity_threshold=0.5, min_chunk_size=100, max_chunk_size=1000):
@@ -61,6 +64,7 @@ class embedService:
         """
         if not self.dataset:
             print("No data loaded to chunk")
+            yield "No data loaded to chunk\n"
             return []
         
         try:
@@ -68,6 +72,7 @@ class embedService:
             import numpy as np
         except ImportError:
             print("Installing numpy...")
+            yield "Installing numpy...\n"
             import subprocess
             subprocess.check_call(["pip", "install", "numpy"])
             import numpy as np
@@ -85,10 +90,12 @@ class embedService:
             return []
         
         print(f"Chunking {len(sentences)} sentences using Ollama embeddings...")
+        yield f"Chunking {len(sentences)} sentences using Ollama embeddings...\n"
         
         # Get embeddings for all sentences
         try:
             print("Embedding sentences in batch...")
+            yield "Embedding sentences in batch...\n"
             response = ollama.embed(
                 model=self.model,
                 input=sentences  # Can pass a list!
@@ -96,10 +103,12 @@ class embedService:
             embeddings = [np.array(emb) for emb in response['embeddings']]
         except Exception as e:
             print(f"Error with batch embedding: {e}")
+            yield f"Error with batch embedding: {e}\n"
             return []
             
         if len(embeddings) != len(sentences):
             print(f"Warning: Only got {len(embeddings)} embeddings for {len(sentences)} sentences")
+            yield f"Warning: Only got {len(embeddings)} embeddings for {len(sentences)} sentences\n"
             # Filter sentences to match embeddings
             sentences = [s for i, s in enumerate(sentences) if i < len(embeddings)]
         
@@ -137,6 +146,8 @@ class embedService:
         
         print(f"Created {len(chunks)} semantic chunks")
         print(f"Avg chunk size: {sum(len(c) for c in chunks) // len(chunks)} chars")
+        yield f"Created {len(chunks)} semantic chunks\n"
+        yield f"Avg chunk size: {sum(len(c) for c in chunks) // len(chunks)} chars\n"
         
         self.raw_chunks = chunks
 
@@ -146,6 +157,7 @@ class embedService:
         import ollama
         
         print(f"Embedding {len(self.raw_chunks)} chunks for ChromaDB...")
+        yield f"Embedding {len(self.raw_chunks)} chunks for ChromaDB...\n"
         
         try:
             response = ollama.embed(
@@ -154,9 +166,11 @@ class embedService:
             )
             embeddings = response['embeddings']
             print(f"Successfully embedded {len(embeddings)} chunks")
+            yield f"Successfully embedded {len(embeddings)} chunks\n"
             self.embedded_chunks = embeddings
         except Exception as e:
             print(f"Error embedding chunks: {e}")
+            yield f"Error embedding chunks: {e}\n"
             self.embedded_chunks = []
     
     # Store sel.embedded_chunks to ChromaDB collection corresponding to self.model
@@ -169,41 +183,35 @@ class embedService:
                 metadatas=[{"model": self.model}]
             )
         print("Data stored to ChromaDB")
+        yield "Data stored to ChromaDB\n"
 
     # list all collections in the chroma client db
     def list_collections(self):
         collections = self.client.list_collections()
         print(collections)
         x = self.client.count_collections()
-        print(x)
+        print("Total collections:", x)
+        yield f"{collections}\n"
+        yield f"Total collections: {x}\n"
     
     # Remove a user chosen collection
     def remove_collection(self, name:str):
         self.client.delete_collection(name)
+        print(f"Collection '{name}' removed.")
+        yield f"Collection '{name}' removed.\n"
 
-@app.command()
+
 def embed_docs():
-    """
-    Embed all documents in queue to ChromaDB
-    """
     service = embedService()
-    service.load_data()
-    service.semantic_chunk()
-    service.embed_chunks()
-    service.store_data()
+    yield from service.load_data()
+    yield from service.semantic_chunk()
+    yield from service.embed_chunks()
+    yield from service.store_data()
 
-@app.command()
 def list_collections():
-    """
-    List all ChromaDB collections
-    """
     service = embedService()
-    service.list_collections()
+    yield from service.list_collections()
 
-@app.command()
 def remove_collection(name: str):
-    """
-    Remove a chosen ChromaDB Collection based on embedding model
-    """
     service = embedService()
-    service.remove_collection(name)
+    yield from service.remove_collection(name)

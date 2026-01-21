@@ -1,11 +1,12 @@
 import requests
-from .cli import app
+from .main import app
+from core.config import load_server_url
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = load_server_url()
 
 @app.command()
 def chat():       
-    """Start a chat session with your LLM."""
+    """Start a chat"""
     print("Starting chat session with RagForge (type 'exit()' to quit)")
     print("-" * 50)
     
@@ -19,12 +20,14 @@ def chat():
             
         # Send request to server
         try:
-            resp = requests.post(f"{API_URL}/chat", json={"query": query})
+            resp = requests.post(f"{API_URL}/chat", json={"query": query},stream=True)
             if resp.status_code == 200:
-                print(resp.json()["response"])
+                for chunk in resp.iter_content(chunk_size=None, decode_unicode=True):
+                    if chunk:
+                        print(chunk, end="", flush=True)
             else:
                 print(f"Error {resp.status_code}: {resp.text}")
         except requests.exceptions.RequestException as e:
             print(f"Connection error: {e}")
         
-        print("-" * 50)
+        print("\n" +"-" * 50)
